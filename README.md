@@ -2,11 +2,11 @@
 Code to automate actions on Canvas using CanvasAPI
 
 # Description
-The CanvasAPI and its python wrapper provide a powerful framework to automate repetitive actions on the Canvas platform. In this repository we expand on these methods and we create pipelines to perform a variety of common teaching tasks, such as scheduling quizzes and exams, as well as creating summary statistics and plots. The routines have been designed (but not restricted) to work best with large auditorium courses at the Physics Department the University of Florida.
+The CanvasAPI and its python wrapper provide a powerful framework to automate repetitive actions on the Canvas platform for teachers. In this repository we expand on these methods and we create pipelines to perform a variety of common teaching tasks, such as scheduling quizzes and exams, as well as creating summary statistics and plots. The routines have been designed (but not restricted) to work best with large auditorium courses at the Physics Department the University of Florida.
 
 # Getting started
 ## Creating an API key
-The CanvasAPI library gives access to restricted information present on Canvas Course, which is available only to Canvas users with the appropriate permissions (e.g. teaching personel, course designers). As a result, authentication is needed to access this information. This comes in the form of API keys. The official Canvas API documentation page provides a lot of information on how to generate one. The simplest method is the following:
+The CanvasAPI library gives access to restricted information present on Canvas Course, which is available only to Canvas users with the appropriate permissions (e.g. teaching personel, course designers). As a result, authentication is needed to access this information. This comes in the form of API keys. The official Canvas API documentation page provides a lot of information on how to generate one. As described there, the simplest method of generating one is the following:
 
 1. Go on Canvas and click the "profile" link in the top right menu bar, or navigate to /profile
 2. Under the "Approved Integrations" section, click the button to generate a new access token.
