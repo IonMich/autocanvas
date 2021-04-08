@@ -18,8 +18,8 @@ def get_API_key():
 
     if API_KEY is None:
         raise FileNotFoundError("A `.env` file was not found. You need "
-                            "to create a `.env` inside the `input` " 
-                            "directory and add a single entry:\n\n"
+                            "to create a `.env` inside the top-level " 
+                            "directory (same dir as requirements.txt) and add a single entry:\n\n"
                             "API_KEY=<value>\n\nSubstitute <value> with "
                             "your API key. You can find more info in the wiki.")
     else:
