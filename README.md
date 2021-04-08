@@ -49,7 +49,7 @@ Some of the main dependencies of the code are:
 - `beautifulsoup4`>=4.9.3
 - `lxml`
 - `python-dotenv`>=0.17.0
-- `aiohhtp`
+- `aiohttp`
 - `seaborn`
 - `tabulate`
 
