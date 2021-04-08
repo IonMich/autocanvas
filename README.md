@@ -7,7 +7,11 @@ The CanvasAPI and its python wrapper provide a powerful framework to automate re
 # Getting started
 The easiest way to make use of this codebase is by reading the Jupyter Notebooks in the `pipes` and `tests` folders.  There you can find a step by step implementation of many pipelines. **NOTE**: before you can run these codes, you will need to install this package, by navigating to the directory where `setup.py` resides, and running:
 
-```pip install -e .```
+```
+conda install ipykernel
+conda install pip
+pip install -e .
+```
 
 In the future, a non-interactives way of running these pipelines might be offered.
 
@@ -41,6 +45,7 @@ Some of the main dependencies of the code are:
 - `canvasapi`>=2.2.0
 - `pandas`>=1.2.3
 - `xlrd`
+- `ipykernel`
 - `beautifulsoup4`>=4.9.3
 - `lxml`
 - `python-dotenv`>=0.17.0
