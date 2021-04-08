@@ -44,7 +44,7 @@ Some of the main dependencies of the code are:
 - `selenium`>=3.141.0
 - `canvasapi`>=2.2.0
 - `pandas`>=1.2.3
-- `xlrd`
+- `openpyxl`
 - `ipykernel`
 - `beautifulsoup4`>=4.9.3
 - `lxml`
