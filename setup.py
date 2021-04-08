@@ -13,7 +13,7 @@ setup(name='autocanvas',
       author='Ioannis Michaloliakos',
       author_email='ioannis.michalol@ufl.edu',
       python_requires='>=3.7',
-      requirements=get_requirements(),    
+      install_requires=get_requirements(),    
       packages=['autocanvas', 'autocanvas.core'],
       package_dir={'autocanvas': 'autocanvas'})
 
