@@ -31,5 +31,7 @@ Some of the main dependencies of the code are:
 - `pandas`>=1.2.3
 - `beautifulsoup4`>=4.9.3
 - `python-dotenv`>=0.17.0
+- `aiohhtp`
+- `seaborn`
 
 # Known Issues
