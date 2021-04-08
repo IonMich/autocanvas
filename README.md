@@ -19,6 +19,8 @@ Next, in order to be able to run the jupyter Notebooks, install ipython kernels:
 
 ```conda install ipykernel```
 
+Download this package with one of the available methods offred by the platform (http, ssh, or zip file).
+
 Finally, navigate to the directory where `setup.py` resides, and run:
 
 ```
