@@ -26,12 +26,10 @@ Implemented Pipelines:
 
 # Dependencies
 Some of the main dependencies of the code are:
-- `numpy`
-- `matplotlib`
-- `canvasapi`
-- `pandas`
-- `seaborn`
-- `asyncio`
-- `aiohhtp`
+- `selenium`>=3.141.0
+- `canvasapi`>=2.2.0
+- `pandas`>=1.2.3
+- `beautifulsoup4`>=4.9.3
+- `python-dotenv`>=0.17.0
 
 # Known Issues
