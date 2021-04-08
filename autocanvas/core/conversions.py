@@ -2,8 +2,8 @@ import pandas as pd
 from canvasapi.paginated_list import PaginatedList
 
 
-def df_from_apilist(api_list, drop_requester=True, drop_created_at=True, 
-                    set_index_id=True, bring_tofront="name"):
+def df_from_api_list(api_list, drop_requester=True, drop_created_at=True, 
+                    set_index_id=True, bring_to_front="name"):
     """
     Convert list from API (i.e. `list(PaginatedList)` or 
     simply PaginatedList) to pandas by extracting all the 
@@ -30,9 +30,9 @@ def df_from_apilist(api_list, drop_requester=True, drop_created_at=True,
         df = df.drop("created_at", errors="ignore", axis=1)
     if set_index_id:
         df = df.set_index("id")
-    if bring_tofront is not None:
-        df = df[ [bring_tofront] + [col for col in df.columns 
-                                        if col != bring_tofront] 
+    if bring_to_front is not None:
+        df = df[ [bring_to_front] + [col for col in df.columns 
+                                        if col != bring_to_front] 
                ]
     return df
 
