@@ -124,17 +124,17 @@ def get_section_info_from_html(ufsoc_html, last_person_is_TA=True,
     return pd.DataFrame(all_section_info)
 
 
-def store_section_ta_to_csv(input_dir=None, identifier=None,**kwargs):
+def store_section_ta_to_csv(output_dir=None, identifier=None,**kwargs):
     """
     """
-    input_dir = '' if input_dir is None else str(input_dir)
+    output_dir = '' if output_dir is None else str(output_dir)
     identifier = '' if identifier is None else str(identifier)
     if len(identifier)>0:
         if identifier[0] not in ["_", "-", "."]:
             identifier = "_" + identifier
     
     df = get_sections_from_ufsoc(**kwargs)
-    file_path = input_dir+"section_ta"+identifier+".csv"
+    file_path = output_dir+"section_ta"+identifier+".csv"
     print(file_path)
     df.to_csv(file_path, index=False)
     return df
