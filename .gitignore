@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+autocanvas/input/quiz_times_spring2021.xlsx
