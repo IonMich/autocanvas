@@ -1,15 +1,17 @@
 # settings.py
 import os
 from os.path import join, dirname
+from pathlib import Path
 from dotenv import load_dotenv
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-INPUT_DIR = join(ROOT_DIR, "input")
-OUTPUT_DIR = join(ROOT_DIR, "output")
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+TOPLEVEL_DIR = str(Path(PACKAGE_DIR).parent.absolute())
+INPUT_DIR = join(PACKAGE_DIR, "input")
+OUTPUT_DIR = join(PACKAGE_DIR, "output")
 
 
 def get_API_key():
-    dotenv_path = join(INPUT_DIR, '.env')
+    dotenv_path = join(TOPLEVEL_DIR, '.env')
     load_dotenv(dotenv_path)
 
     API_KEY = os.environ.get("API_KEY")
