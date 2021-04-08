@@ -1,7 +1,10 @@
 selenium>=3.141.0
 canvasapi>=2.2.0
 pandas>=1.2.3
+tabulate
+xlrd
 beautifulsoup4>=4.9.3
+lxml
 python-dotenv>=0.17.0
 aiohhtp
 seaborn

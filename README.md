@@ -29,9 +29,14 @@ Some of the main dependencies of the code are:
 - `selenium`>=3.141.0
 - `canvasapi`>=2.2.0
 - `pandas`>=1.2.3
+- `xlrd`
 - `beautifulsoup4`>=4.9.3
+- `lxml`
 - `python-dotenv`>=0.17.0
 - `aiohhtp`
 - `seaborn`
+- `tabulate`
+
+
 
 # Known Issues
