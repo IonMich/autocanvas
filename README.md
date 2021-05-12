@@ -2,7 +2,7 @@
 Code to automate actions on Canvas using CanvasAPI
 
 # Description
-The CanvasAPI and its python wrapper provide a powerful framework to automate repetitive actions on the Canvas platform for teachers. In this repository we expand on these methods and we create pipelines to perform a variety of common teaching tasks, such as scheduling quizzes and exams, as well as creating summary statistics and plots. The routines have been designed (but not restricted) to work best with large auditorium courses at the Physics Department the University of Florida.
+The CanvasAPI and its python wrapper provide a powerful framework to automate repetitive actions on the Canvas platform for teachers. In this repository we expand on these methods and we create pipelines to perform a variety of common teaching tasks, such as scheduling quizzes and exams, as well as creating summary statistics and plots. The routines have been designed (but not restricted) to work best with large auditorium courses at the Physics Department the University of Florida. Most of the routines rely on the section information, so courses without student sections will need to use the official Canvas API.
 
 # Getting started
 The easiest way to make use of this codebase is by reading the Jupyter Notebooks in the `pipes` and `tests` folders.  There you can find a step by step implementation of many pipelines. **NOTE**: before you can run these codes, you will need to install this package, 
