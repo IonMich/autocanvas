@@ -127,6 +127,9 @@ def get_assignment_collection(course,
     TODO: give examples for patterns in the docstring
     
     """
+    if exclude_numbers and (add_identifier_numbers is False):
+        raise ValueError("Can't exclude numbers if numbers are not identified.")
+    
     assignment_group = get_assignment_group_from_name(
                             course, 
                             group_name=assignment_group_name)
@@ -143,13 +146,6 @@ def get_assignment_collection(course,
         # Select assignements whose name is "Quiz ####" (one or more digits)
         df_assignments = df_assignments[df_assignments[title_column]
                                         .str.match(name_pattern)]
-    if exclude_numbers is not None:
-        # Exclude assignments that contain e.g. " 0", " 10", " 13" 
-        # with a negative lookahead regex
-        numbers_text = r"|".join([r" {}".format(x) for x in exclude_numbers])
-        exclude_numbers_pattern = r"^((?!"+numbers_text+").)*$"
-        df_assignments = df_assignments[df_assignments[title_column]
-                                        .str.match(exclude_numbers_pattern)]
         
     if add_identifier_numbers:
         df_assignments["identifier_number"] = \
@@ -158,6 +154,15 @@ def get_assignment_collection(course,
         df_assignments["identifier_number"] = \
                     pd.to_numeric(df_assignments["identifier_number"], 
                                   errors="coerce")
+        if exclude_numbers:
+            df_assignments = df_assignments[~df_assignments["identifier_number"]
+                                            .isin(exclude_numbers)]
+#             # Exclude assignments that contain e.g. " 0", " 10", " 13" 
+#             # with a negative lookahead regex
+#             numbers_text = r"|".join([r" {}".format(x) for x in exclude_numbers])
+#             exclude_numbers_pattern = r"^((?!"+numbers_text+").)*$"
+#             df_assignments = df_assignments[df_assignments[title_column]
+#                                             .str.match(exclude_numbers_pattern)]
     
     return df_assignments
 
