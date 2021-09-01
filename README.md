@@ -8,16 +8,20 @@ The CanvasAPI and its python wrapper provide a powerful framework to automate re
 The easiest way to make use of this codebase is by reading the Jupyter Notebooks in the `pipes` and `tests` folders.  There you can find a step by step implementation of many pipelines. **NOTE**: before you can run these codes, you will need to install this package, 
 
 ## Installation Instructions
-While notstrictly required, it is recommended that you manage dependenccies for this project by [installing conda](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/macos.html) and then creating a virtual invironment by running:
+While notstrictly required, it is recommended that you manage dependenccies for this project by [installing conda](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/macos.html) and then creating a virtual invironment, by running (replace `<any_name_for_kernel>` with a name of your choice for the new kernel):
 
 ```
-conda create -n mypython3 python=3.9  
-conda activate mypython3
+conda create -n <any_name_for_kernel> python=3.9  
+conda activate <any_name_for_kernel>
 ```
 
 Next, in order to be able to run the jupyter Notebooks, install ipython kernels:
 
-```conda install ipykernel```
+```
+conda install ipykernel
+ipython kernel install --user --name=<any_name_for_kernel>
+```
+
 
 Download this package with one of the available methods offred by the platform (http, ssh, or zip file).
 
@@ -25,7 +29,6 @@ Finally, navigate to the directory where `setup.py` resides, and run:
 
 ```
 conda install pip
-pip install -e .
 ```
 
 Check that your installation worked by trying to import the package in a python script or in a python interactive terminal:
