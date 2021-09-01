@@ -97,7 +97,9 @@ def get_assignment_submissions(assignment,
     if len_auto>0:
         print("Warning! {} students appear to be autograded!".format(len_auto))
         if (df_students is not None):
-            print(df_subs[mask].short_name)
+            pass
+#         The following line has a type error, so commented out
+#             print(df_subs[mask].short_name)
         if (df_TAs is not None):
             print("Replacing grader_id with section_ta_id.")
             df_subs_valid = df_subs[mask]
