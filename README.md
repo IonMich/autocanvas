@@ -59,7 +59,20 @@ Implemented Pipelines:
 - Fix the grade of individual questions of a Quiz assignment.
 - Create summary plots for weekly quiz grading, grouped by Teaching Assistant (TA).
 - Get summary statistics (mean, std) for quiz scores grouped by TA.
-- Create quiz overrides for groups of students, based on their section.
+- Create quiz overrides for individual students, based on their section.
+
+# Examples
+
+### Monitoring uniformity across graders for a single quiz 
+![Violin Plots](autocanvas/output/EXAMPLE_violinplot_quiz.png "Grade Distributions per TA")
+
+### Monitoring quiz averages
+Progression of Quiz averages per TA. The calculation takes into account the fact that the same students are graded by each TA every week, so the sample grades are *not* i.i.d., and therefore the errorbars in the estimated grade average shrink only moderately. 
+![Averages Plots](autocanvas/output/EXAMPLE_grade_progression_TA.png "Grade Averages per TA")
+
+### Monitoring quiz grading progress
+Verifying that all quizzes are graded. 
+![Grading progress](autocanvas/output/EXAMPLE_quiz_grading_progress.png "Grading Progress")
 
 # Dependencies
 Some of the main dependencies of the code are:
