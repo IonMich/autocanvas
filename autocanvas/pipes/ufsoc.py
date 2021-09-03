@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import Select
 import re
 from bs4 import BeautifulSoup
 import pandas as pd
+from os.path import join
 
 
 def get_sections_from_ufsoc(semester,
@@ -134,9 +135,12 @@ def store_section_ta_to_csv(output_dir=None, identifier=None,**kwargs):
             identifier = "_" + identifier
     
     df = get_sections_from_ufsoc(**kwargs)
-    file_path = output_dir+"section_ta"+identifier+".csv"
+    
+    file_name = "sections" + identifier + ".csv"
+    file_path = join(output_dir, file_name)
     print(file_path)
     df.to_csv(file_path, index=False)
+    
     return df
 
 
