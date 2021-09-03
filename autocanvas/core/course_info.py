@@ -2,6 +2,82 @@ import pandas as pd
 import re
 from .conversions import series_from_api_object, df_from_api_list
 
+day_abbrs = ("M", "T", "W", "R", "F")
+
+
+class Periods():
+    def __init__(self, start_time, duration, timedelta, num_periods):
+        self.start_time = start_time
+        self.duration = duration
+        self.timedelta = timedelta
+        self.num_periods = num_periods
+        self.start_times = self.get_start_times()
+        self.end_times = self.get_end_times()
+        
+    @classmethod
+    def Fall(cls):
+        start_time = "07:25:00"
+        duration = "00:50:00"
+        timedelta = "01:05:00"
+        num_periods = 11
+        return cls(start_time, duration, timedelta, num_periods)
+    
+    @classmethod
+    def Spring(cls):
+        return cls.Fall()
+    
+    @classmethod
+    def SummerC(cls):
+        start_time = "08:00:00"
+        duration = "01:05:00"
+        timedelta = "01:30:00"
+        num_periods = 7
+        return cls(start_time, duration, timedelta, num_periods)
+    
+    @classmethod
+    def SummerA(cls):
+        start_time = "08:00:00"
+        duration = "01:15:00"
+        timedelta = "01:30:00"
+        num_periods = 7
+        return cls(start_time, duration, timedelta, num_periods)
+    
+    @classmethod
+    def SummerB(cls):
+        return cls.SummerA()
+    
+    @classmethod
+    def Summer(cls):
+        return cls.SummerC()
+    
+    @classmethod
+    def from_season(cls, season):
+        for method_name  in cls.__dict__:
+            if method_name.lower()==season.lower():
+                return getattr(cls, method_name)()
+        else:
+            raise ValueError("Constructor not found for this season")
+    
+    def get_start_times(self):
+        base_date = "1980-1-1"
+        return pd.date_range(start=base_date + " " + self.start_time, 
+                              periods=self.num_periods, 
+                              freq=pd.to_timedelta(self.timedelta))
+    def get_end_times(self):
+        return self.start_times + pd.to_timedelta(self.duration)        
+    
+    def get_dataframe(self):
+        start = self.start_times.to_frame(index=False, name='start_times')
+        end = self.end_times.to_frame(index=False, name='end_times')
+        df_periods = (pd.merge(left=start,right=end, 
+                        left_index=True, right_index=True)
+                      .applymap(lambda item:item.time())
+                     )
+        df_periods.index = range(1,len(df_periods)+1)
+        df_periods.index.name = "Period"
+        return df_periods
+
+
 def get_PHY_course(canvas, course_code, semester, course_id=None):
     myself = canvas.get_current_user()
     mycourses = myself.get_courses()
