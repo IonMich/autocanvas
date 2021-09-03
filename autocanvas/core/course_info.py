@@ -157,6 +157,7 @@ def get_sections(course,
             raise NotImplementedError(message)
         # Removing MISC and PHY2054
         df_sections = df_sections[~df_sections["students"].isnull()]
+        df_sections = df_sections[~df_sections["name"].str.contains("-MISC")]
     if add_class_number:
         df_sections["class_number"] = (df_sections["name"]
                                           .str.extract(r'\w+\((\d+)', 
