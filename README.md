@@ -29,6 +29,7 @@ Finally, navigate to the directory where `setup.py` resides, and run:
 
 ```
 conda install pip
+pip install -e .
 ```
 
 Check that your installation worked by trying to import the package in a python script or in a python interactive terminal:
