@@ -223,6 +223,8 @@ def get_submitted_submissions(df_subs):
     df_submitted = df_subs[(df_subs["excused"]!=1) &
                         (df_subs["missing"]!=1)].copy()
     
+    df_submitted = df_submitted[df_submitted["workflow_state"]!="unsubmitted"].copy()
+    
     return df_submitted
 
 
