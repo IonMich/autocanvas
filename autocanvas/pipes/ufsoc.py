@@ -32,7 +32,7 @@ def get_sections_from_ufsoc(semester,
     # This takes you to the schedule of courses
     driver.get(url)
     
-    general_filter_ids = ["semes", "prog", "progLevel", "dep"]
+    general_filter_ids = ["term", "category", "prog-level", "dept"]
     option_texts = [semester, program, program_level, department]
     options_dict = dict(zip(general_filter_ids, option_texts))
 
@@ -41,11 +41,13 @@ def get_sections_from_ufsoc(semester,
         # select by visible text
         select.select_by_visible_text(option_text)
 
-    course_filter_ids = ["courseCode", "courseTitle", "instructor"]
+    course_filter_ids = ["course-number", "course-title", "instructor"]
     input_texts = [course_code, course_title, instructor]
     inputs_dict = dict(zip(course_filter_ids, input_texts))
     
-    driver.find_element_by_id("courseFilters").click()
+    # TODO: click only if expand==False:
+#     driver.find_element_by_id("general-filter-header").click()
+    
     for element_id, input_text in inputs_dict.items():
         driver.find_element_by_id(element_id).send_keys(input_text)
     else:
@@ -54,15 +56,15 @@ def get_sections_from_ufsoc(semester,
     # Wait for course to appear
     max_wait_sec = 10
     course_element = WebDriverWait(driver, max_wait_sec).until(
-        lambda x: x.find_element("xpath", '//*[@class="course-container ng-scope"]')) 
-    course_element.click()
+        lambda x: x.find_element_by_id("sect0")) 
+#     course_element.click()
     
-    ufsoc_course_html = driver.find_element_by_id("ufSOC").get_attribute("outerHTML")
+    ufsoc_course_html = driver.find_element_by_id("sect0").get_attribute("outerHTML")
     df = get_section_info_from_html(
                     ufsoc_html=ufsoc_course_html, 
                     last_person_is_TA=last_person_is_TA,
                     only_first_meeting_is_lecture=only_first_meeting_is_lecture)
-    return df
+    return df, ufsoc_course_html
 
 
 def get_section_info_from_html(ufsoc_html, last_person_is_TA=True, 
@@ -73,24 +75,46 @@ def get_section_info_from_html(ufsoc_html, last_person_is_TA=True,
     """
         
     soup = BeautifulSoup(ufsoc_html, features="lxml")
-    sections = soup.find_all("div", {"class": "section-tile ng-scope"})
+    sections = soup.find_all("div", {"class": "MuiPaper-root sc-euMpEg iGKUE MuiPaper-outlined MuiPaper-rounded"})
     
     all_section_info = []
     for section in sections:
         # uncomment to troubleshoot
         # print(section)
-        class_header = section.findChildren(
-                        attrs={"class":
-                               "course-subhead ng-binding ng-scope"}, 
-                        recursive=True)[0].text
-        class_number = re.findall(r"Class Number:\s*(\d{5})", class_header)[0]
+        # Class number
+        class_number_div , details_div = \
+                        section.find_all('div', recursive=False)
+        class_number = re.findall(r"Class #\s*(\d{5})", 
+                                  class_number_div.text)[0]
         
-        teaching_personel = section.findChildren(
-                        attrs={"class":
-                               "instructor-name ng-binding ng-scope"}, 
-                        recursive=True)
-        len_teaching_personel = len(teaching_personel)
+        left_side_div, right_side_div = details_div.find_all('div', 
+                                                             recursive=False)
+        # Meeting times
+        meeting_times_div = left_side_div.find_all('div', recursive=False)[0]
+        meetings = meeting_times_div.find_all('div', recursive=False)
+        meeting_names = ["meeting_" + str(idx+1) 
+                         for idx in range(len(meetings))]
+        if only_first_meeting_is_lecture:
+            meeting_names[0] = "lecture_times"
+        meeting_times = []
+        for meeting in meetings:
+            text = meeting.text.replace("\xa0", "")
+            meeting_days, meeting_period = re.findall(r"(.*)\|.*Period (\d+)", 
+                                                         text
+                                                     )[0]
+            meeting_time = "{} | Period {}".format(meeting_days, meeting_period)
+            meeting_times.append(meeting_time)
+
+        meetings_dict = dict(zip(meeting_names, meeting_times))
+        
+        # Teaching Personel
+        teaching_personel_div = right_side_div.find_all("div", recursive=True)[3]
+        teaching_personel = teaching_personel_div.find_all("p",recursive=True)
         teaching_personel = [person.text for person in teaching_personel]
+        teaching_personel_col_names = ["instuctor_"+str(idx+1) 
+                                       for idx in range(len(teaching_personel))]
+        len_teaching_personel = len(teaching_personel)
+        teaching_personel = [person for person in teaching_personel]
         teaching_personel_col_names = ["instuctor_"+str(idx+1) 
                                        for idx in range(len_teaching_personel)]
         if last_person_is_TA:
@@ -98,29 +122,12 @@ def get_section_info_from_html(ufsoc_html, last_person_is_TA=True,
         teaching_personel_dict = dict(zip(teaching_personel_col_names, 
                                           teaching_personel))
         
-        meeting_elements = section.findChildren(attrs={"class":
-                                                       "ng-binding ng-scope"}, 
-                                                recursive=True)
-        meeting_times = [element.text for element in meeting_elements 
-                         if "|" in element.text]
-        len_meetings = len(meeting_times)
-        meeting_names = ["meeting_"+str(idx+1) for idx in range(len_meetings)]
-        if only_first_meeting_is_lecture:
-            meeting_names[0] = "lecture_times"
-
-        meeting_dict = dict(zip(meeting_names, meeting_times))
-        
-#         # difficult to add room info, because it is not 
-#         # recognized as text if it is online
-#         meeting_rooms = [element.text for element in meeting_elements]
-#         print(meeting_rooms)
-        
         all_section_info.append({
                         **{
                     "class_number":class_number,
                         }, 
                         **teaching_personel_dict,
-                        **meeting_dict,})
+                        **meetings_dict,})
         
     return pd.DataFrame(all_section_info)
 
@@ -134,14 +141,14 @@ def store_section_ta_to_csv(output_dir=None, identifier=None,**kwargs):
         if identifier[0] not in ["_", "-", "."]:
             identifier = "_" + identifier
     
-    df = get_sections_from_ufsoc(**kwargs)
+    df, html = get_sections_from_ufsoc(**kwargs)
     
     file_name = "sections" + identifier + ".csv"
     file_path = join(output_dir, file_name)
     print(file_path)
     df.to_csv(file_path, index=False)
     
-    return df
+    return df, html
 
 
 def parse_PHY_section_info(df):
