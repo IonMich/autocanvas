@@ -228,20 +228,30 @@ def get_submitted_submissions(df_subs):
     return df_submitted
 
 
-def get_student_answers(df_submitted):
+def get_student_answers(df_submitted, keep_only_last_submission=False):
     assert "submission_history" in df_submitted.columns
     answers_list = []
     for index, submission in df_submitted.iterrows():
         user_id = submission.user_id
         student_name = submission["name"]
-        assert len(submission.submission_history)==1
-        assert submission.submission_history[-1]["submission_data"] is not None
+    #     assert len(submission.submission_history)==1
+        if len(submission.submission_history)!=1:
+            print(submission["name"], len(submission.submission_history), "submissions - keeping only latest!")
+        if "submission_data" not in submission.submission_history[-1].keys():
+            print(f"Skipping student {student_name}. No data found in their submission")
+            print(f"Their workflow state is {submission.workflow_state} and their score {submission.score}")
+            continue
+    #         print(submission.submission_history[-1])
+    #     assert submission.submission_history[-1]["submission_data"] is not None
         sub_data = submission.submission_history[-1]["submission_data"]
-        for question_data in sub_data:
+        for position, question_data in enumerate(sub_data, 1):
             question_data["user_id"] = user_id
             question_data["student_name"] = student_name
+            question_data["position"] = position
             answers_list.append(question_data)
-    return pd.DataFrame(answers_list)
+
+    df_student_answers = pd.DataFrame(answers_list)
+    return df_student_answers
 
 
 def get_quiz(course, title=None, group=None, number=None,
