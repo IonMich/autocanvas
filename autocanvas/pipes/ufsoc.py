@@ -11,6 +11,18 @@ from os.path import join
 import time
 from selenium.common.exceptions import NoSuchElementException
 
+import requests
+
+_HEADERS = {
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9,el;q=0.8",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Referer": "https://one.uf.edu/soc/",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+}
 
 
 def get_sections_from_ufsoc(semester,
@@ -257,14 +269,14 @@ def store_section_ta_to_csv(output_dir=None, identifier=None,**kwargs):
         if identifier[0] not in ["_", "-", "."]:
             identifier = "_" + identifier
     
-    df, html, driver = get_sections_from_ufsoc(**kwargs)
+    df = get_course_from_UFSOC_apix(**kwargs)
     
     file_name = "sections" + identifier + ".csv"
     file_path = join(output_dir, file_name)
     print(file_path)
     df.to_csv(file_path, index=False)
     
-    return df, html, driver
+    return df
 
 
 def parse_PHY_section_info(df):
@@ -318,3 +330,104 @@ def parse_PHY_section_info(df):
     
         
     return None
+
+def get_course_from_UFSOC_apix(
+    term_name,
+    class_number="",
+    course_code="",
+    course_title="",
+    department_name="",
+    instructor_name="",
+    program_level_name="Undergraduate",
+):
+    """
+    """
+
+    url = "https://one.uf.edu/apix/soc/schedule"
+
+    soc_filters = get_soc_filters()
+    # categories = pd.json_normalize(soc_filters["categories"])
+    progLevels = pd.json_normalize(soc_filters["progLevels"])
+    terms = pd.json_normalize(soc_filters["terms"])
+    departments = pd.json_normalize(soc_filters["departments"])    
+
+    term_code = terms.loc[terms["DESC"]==term_name]["CODE"].values[0]
+    if department_name != "":
+        department_code = departments.loc[departments["DESC"]==department_name]["CODE"]
+        if len(department_code)==0:
+            raise ValueError("Department not found: {}".format(department_name))
+        department_code = department_code.values[0]
+    else:
+        department_code = ""
+    if program_level_name != "":
+        program_level_code = progLevels.loc[progLevels["DESC"]==program_level_name]["CODE"]
+        if len(program_level_code)==0:
+            raise ValueError("Program level not found: {}".format(program_level_name))
+        program_level_code = program_level_code.values[0]
+
+    querystring = {
+        "category":"CWSP",
+        "class-num":class_number,
+        "course-code":course_code,
+        "course-title":course_title,
+        "dept":department_code,
+        "instructor":instructor_name,
+        "prog-level":program_level_code,
+        "term":term_code,}
+
+    response = requests.request("GET", url, headers=_HEADERS, params=querystring)
+
+    if response.status_code != 200:
+        raise ValueError("Error: {}".format(response.status_code))
+
+    response_json = response.json()
+    if len(response_json) == 0:
+        raise ValueError("No courses found")
+    if len(response_json) > 1:
+        raise ValueError("More than one course found")
+
+    return response_json[0]["COURSES"]
+
+def get_section_info_from_UFSOC_json(
+    json_data,
+    last_person_is_TA=True,
+    only_first_meeting_is_lecture=True,
+):
+    """
+    """
+    instructors = []
+    course_sections = pd.json_normalize(json_data[0]["sections"])[["classNumber","instructors", "meetTimes"]]
+    max_instructors = max(course_sections["instructors"].apply(len))
+    instructor_col_names = ["instructor_" + str(i+1) for i in range(max_instructors)]
+    instructors = pd.DataFrame(course_sections['instructors'].to_list(), columns=instructor_col_names)
+    instructors = instructors.applymap(lambda x: x.get("name"))
+
+    max_meetings = max(course_sections["meetTimes"].apply(len))
+    meeting_names = ["meeting_" + str(i+1) for i in range(max_meetings)]
+    meeting_times = pd.DataFrame(course_sections["meetTimes"].tolist(), columns=meeting_names)
+    meeting_days = meeting_times.applymap(lambda x: ",".join(x.get("meetDays")))
+    meeting_period = meeting_times.applymap(lambda x: x.get("meetPeriodBegin"))
+
+    meeting_times = meeting_days + " | Period " + meeting_period
+
+    course_sections = pd.concat(
+        [course_sections["classNumber"], instructors, meeting_times], 
+        axis=1).rename(columns={"classNumber":"class_number"})
+
+    if last_person_is_TA:
+        course_sections.rename(
+            columns={f"instructor_{max_instructors}":"section_ta_name"}, 
+            inplace=True)
+
+    if only_first_meeting_is_lecture:
+        course_sections.rename(
+            columns={f"meeting_1":"lecture_times"}, 
+            inplace=True)
+
+    return course_sections
+
+
+def get_soc_filters():
+    url = "https://one.uf.edu/apix/soc/filters"
+    response = requests.request("GET", url, headers=_HEADERS)
+    return response.json()
